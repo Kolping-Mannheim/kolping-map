@@ -40,7 +40,8 @@
         $res = array(
             "representative" => [],
             "contact" => [],
-            "links" => []
+            "links" => [],
+            "news" => []
         ); 
 
         // home page
@@ -85,6 +86,36 @@
                 }
             }
         }
+
+        $newstabscount = $xpath->query('//ul[contains(@id,"news-tabs")]/li')->length; 
+        if ($newstabscount > 1){
+            $news = $xpath->query('//div[@id="news"]/div/article[contains(@class,"news-item")]'); 
+            foreach ($news as $article){
+                $this_news = [
+                    "date" => $xpath->query('div/p[contains(@class,"news-item-date")]/time', $article)->item(0)->getAttribute("datetime"),
+                    "url" => $xpath->query('div/p[contains(@class,"news-item-headline")]/a', $article)->item(0)->getAttribute("href"),
+                    "title" => trim($xpath->query('div/p[contains(@class,"news-item-headline")]/a', $article)->item(0)->textContent),
+                    "description" => trim($xpath->query('div/p[contains(@class,"news-item-teaser")]', $article)->item(0)->textContent)
+                    
+                ];
+                $res["news"][] = $this_news;
+            }
+        }
+
+        // termine
+        $events = $xpath->query('//div[@class="events"]/div[contains(@class,"event--small")]'); 
+        
+        if ($events->length > 0){
+            foreach ($events as $event){
+                $res["events"][] = [
+                    "date" => $xpath->query('p[@class="event-date"]/time', $event)->item(0)->getAttribute("datetime"),
+                    "title" => $xpath->query('p[@class="event-title"]', $event)->item(0)->textContent,
+                    "description" => $xpath->query('div[@class="event-modal-content"]/div/div[@class="em-content"]', $event)->item(0)->textContent,
+                ];
+            }
+        }
+
+
 
         // impressum
         $rawhtml = getMicrositePage($url."impressum/"); 
@@ -157,10 +188,15 @@
             "name" => trim($entry["name"]),
             "url" => $entry["url"],
             "hasMicrosite" => false,
+            "usesMicrositeNews" => false,
+            "hasMicrositeNewsLast6m" => false,
+            "usesMicrositeEvents" => false,
+            "hasMicrositeEvents" => false,
             "representativeIsContact" => false,
             "representative" => [],
             "contact" => [],
             "links" => [],
+            "news" => [],
             "_kolping_type" => trim($entry["type"]),
             "_kolping_region" => trim($entry["region"]),
             "_raw_kolping" => $entry
@@ -183,6 +219,27 @@
             if (isset($msdata["contact"]["name"])){
                 $local["contact"] = $msdata["contact"];
                 $local["contact"]["source"] = "microsite";
+            }
+
+            if (isset($msdata["news"])){
+                $local["news"] = $msdata["news"];
+                if (sizeof($local["news"]) > 0){
+                    $local["usesMicrositeNews"] = true; 
+
+                    foreach ($local["news"] as $news){
+                        if ($news["date"] > date("Y-m-d", strtotime("-6 months"))){
+                            $local["hasMicrositeNewsLast6m"] = true; 
+                            break; 
+                        }
+                    }
+                }
+            }
+
+            if (isset($msdata["events"]) && sizeof($msdata["events"]) > 0){
+                $local["usesMicrositeEvents"] = true; 
+                $local["hasMicrositeEvents"] = true; 
+
+                $local["events"] = $msdata["events"];
             }
             
             $local["links"] = array_merge($msdata["links"], $local["links"]);

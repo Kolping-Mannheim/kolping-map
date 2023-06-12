@@ -48,6 +48,8 @@
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> Beitragende | &copy; Kolpingwerk Deuschland'
     }).addTo(mymap);
 
+    var kfevents = []; 
+
     $.ajax({
         url: '/api/data/locallist.json',
         dataType: 'json',
@@ -61,6 +63,9 @@
                 if (e.contact && e.contact.name){
                     popup_text.push("<u>Ansprechpartner:</u>");
                     popup_text.push(e.contact.name);
+                    if (e.contact.email){
+                        popup_text.push('<a href="mailto:'+e.contact.email+'">'+e.contact.email+'</a>');
+                    }
                     popup_text.push("");
                 }
                 if (e.hasMicrosite){
@@ -71,6 +76,22 @@
                 }
                 popup_text.push("");
                 popup_text.push("Diözesanverband " + e._kolping_region);
+
+                if (e.hasMicrositeNewsLast6m){
+                    popup_text.push("<ul>");
+                    e.news.forEach((news, n) => {
+                        popup_text.push('<li><a href="'+news.url+'" target="_blank">'+news.title+'</a></li>');
+                    });
+                    popup_text.push("</ul>");
+                } else {
+                    popup_text.push("Diese Kolpingsfamilie hat in den letzten 6 Monaten keine Neuigkeiten veröffentlicht.");
+                }
+                if (e.events){
+                    e.events.forEach((event) => {
+                        event.kf = e.name; 
+                        kfevents.push(event); 
+                    });
+                }
                 if (e.geo){
                     L.marker([e.geo.lat, e.geo.lon], {icon: mapicons["kf"]}).addTo(mymap).bindPopup(popup_text.join('<br>'));
                 }
@@ -90,7 +111,27 @@
                     L.marker([e.geo.lat, e.geo.lon], {icon: mapicons["kh"]}).addTo(mymap).bindPopup(popup_text.join('<br>'));
                 }
             });
+
+            updateEventTable(); 
         }
     });
+
+    updateEventTable = function(){
+        $("#events tbody").html(""); 
+
+        var $tbody = $("#events tbody"); 
+
+        console.log(kfevents);
+        kfevents.sort((a,b) => (a.date > b.date) ? 1 : ((b.date > a.date) ? -1 : 0))
+
+
+        kfevents.forEach((event, e) => {
+            $tr = $("<tr>");
+            $tr.append($("<td>").text(event.date));
+            $tr.append($("<td>").text(event.kf));
+            $tr.append($("<td>").html(event.title + '<br><small>'+event.description+'</small>'));
+            $tbody.append($tr);
+        });
+    }
 
 })();

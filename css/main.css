@@ -1,3 +1,7 @@
 #map {
     height: 860px; 
 }
+
+td {
+    vertical-align: top;
+}
