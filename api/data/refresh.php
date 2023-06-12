@@ -5,17 +5,30 @@
     $data = json_decode($data, true); 
     // var_dump($data); 
 
-    function getMicrositePage ($url){
+    function getMicrositePage ($url, $noncache = false){
         logtxt($url);
         $cache_fn = __DIR__.'/cache/'.md5($url).'.html';
 
         $rawhtml = false; 
-        if (file_exists($cache_fn) && filemtime($cache_fn) > time()-60*60*24*7){
+        if (file_exists($cache_fn) && filemtime($cache_fn) > time()-60*60*24*7 && $noncache == false){
             $rawhtml = file_get_contents($cache_fn); 
             logtxt("using cache");
         } else {
             logtxt("loading page...");
-            $rawhtml = file_get_contents($url); 
+            $ch = curl_init(); 
+        
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                "User-Agent: curl @ map.kolping.community",
+                "Referrer: map.kolping.community"
+            ));
+            
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+            $rawhtml = curl_exec($ch); 
+
+            curl_close($ch); 
+
             if ($rawhtml){
                 file_put_contents($cache_fn, $rawhtml); 
             }
@@ -182,9 +195,24 @@
             $local["representativeIsContact"] = true; 
         }
 
+        if (isset($local["representative"]["address"]) && isset($local["representative"]["zip"]) && isset($local["representative"]["town"])){
+            $url = "https://nominatim.openstreetmap.org/search?q=" . urlencode($local["representative"]["address"].", ".$local["representative"]["zip"]." ".$local["representative"]["town"]) . "&format=jsonv2";
+
+            $geocoding = getMicrositePage($url);
+            if ($geocoding){
+                $geocoding = json_decode($geocoding, true);
+                
+                $geocoding = $geocoding[0]; 
+                $local["geo"]["lat"] = doubleval($geocoding["lat"]);
+                $local["geo"]["lon"] = doubleval($geocoding["lon"]);
+            }
+
+        }
+        // https://nominatim.openstreetmap.org/search?q=" + encodeURIComponent(address) + "&format=json";
+
         $locallist[] = $local; 
 
-        if ($e > 300) break; 
+        if ($e > 1500) break; 
     }
     $list = [
         "meta" => [
