@@ -32,6 +32,15 @@
             //shadowUrl: 'my-icon-shadow.png',
             //shadowSize: [68, 95],
             //shadowAnchor: [22, 94]
+        }),
+        'kh': L.icon({
+            iconUrl: '/img/kolpinghaeuser_tuer.png',
+            iconSize: [20, 20]
+            //iconAnchor: [22, 94],
+            //popupAnchor: [-3, -76],
+            //shadowUrl: 'my-icon-shadow.png',
+            //shadowSize: [68, 95],
+            //shadowAnchor: [22, 94]
         })
     };
 
@@ -66,7 +75,21 @@
                     L.marker([e.geo.lat, e.geo.lon], {icon: mapicons["kf"]}).addTo(mymap).bindPopup(popup_text.join('<br>'));
                 }
             });
-            
+            data.kolpinghaeuser.forEach((e,i) => {
+                var popup_text = [
+                    '<b>' + e.name + '</b>',
+                    ''
+                ];
+                
+                popup_text.push('<a href="'+e.url+'" target="_blank">'+e.url+'</a>');
+                popup_text.push("");
+                popup_text.push(e.address);
+                popup_text.push(e.zip + " " + e.town);
+
+                if (e.geo){
+                    L.marker([e.geo.lat, e.geo.lon], {icon: mapicons["kh"]}).addTo(mymap).bindPopup(popup_text.join('<br>'));
+                }
+            });
         }
     });
 

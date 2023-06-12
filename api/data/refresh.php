@@ -212,13 +212,14 @@
 
         $locallist[] = $local; 
 
-        if ($e > 1500) break; 
+        //if ($e > 1750) break; 
     }
     $list = [
         "meta" => [
             "lastupdated" => date("Y-m-d H:i:s")
         ],
-        "list" => $locallist
+        "list" => $locallist,
+        "kolpinghaeuser" => json_decode(file_get_contents(__DIR__.'/kolpinghaeuser.json'), true)
     ];
     file_put_contents(__DIR__.'/locallist.json', json_encode($list, JSON_PRETTY_PRINT)); 
 ?>
