@@ -2,3 +2,4 @@ api/data/cache/
 api/data/*.json
 api/data/refresh.php
 .gitignore
+osmtiles/cache/*.png
