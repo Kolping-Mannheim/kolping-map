@@ -12,7 +12,9 @@
 
     $sources = scandir(__DIR__.'/sources'); 
     foreach ($sources as $source){
-        if (preg_match("~^kolpingsfamilien\.([a-z0-9]+)\.php$~i", $source)){
+        if (preg_match("~^kolpingsfamilien\.([a-z0-9]+)\.php$~i", $source, $matches)){
+            // if ($matches[1] != "pl") continue; 
+
             $this_list = include __DIR__.'/sources/'.$source; 
             $list["list"] = array_merge($list["list"], $this_list);
         }
