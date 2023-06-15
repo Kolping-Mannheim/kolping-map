@@ -49,6 +49,7 @@
     }).addTo(mymap);
 
     var kfevents = []; 
+    var wordCloudWords = [];
 
     $.ajax({
         url: '/api/data/locallist.json',
@@ -81,6 +82,7 @@
                     popup_text.push("<ul>");
                     e.news.forEach((news, n) => {
                         popup_text.push('<li><a href="'+news.url+'" target="_blank">'+news.title+'</a></li>');
+                        wordCloudWords = wordCloudWords.concat(news.title.split(" "));
                     });
                     popup_text.push("</ul>");
                 } else {
@@ -89,7 +91,9 @@
                 if (e.events){
                     e.events.forEach((event) => {
                         event.kf = e.name; 
+                        event.dv = e._kolping_region; 
                         kfevents.push(event); 
+                        wordCloudWords = wordCloudWords.concat(event.title.split(" "));
                     });
                 }
                 if (e.geo){
@@ -113,6 +117,7 @@
             });
 
             updateEventTable(); 
+            drawWordCloud();
         }
     });
 
@@ -128,10 +133,92 @@
         kfevents.forEach((event, e) => {
             $tr = $("<tr>");
             $tr.append($("<td>").text(event.date));
+            $tr.append($("<td>").text(event.dv));
             $tr.append($("<td>").text(event.kf));
             $tr.append($("<td>").html(event.title + '<br><small>'+event.description+'</small>'));
             $tbody.append($tr);
         });
     }
 
+
+    // d3 wordcloud
+    drawWordCloud = function (){
+        // List of words#
+        console.log(wordCloudWords);
+
+        var wordsByCount = {};
+        wordCloudWords.forEach((word) => {
+            word = word.replace(/(:|”|“)/i, '');
+            var wordLC = word.toLowerCase().trim(); 
+
+            // word is too short
+            if (word.length <= 3) return; 
+
+            // word doesn't contain at least one number/letter
+            if (word.match(/^[^0-9a-z]+$/i)) return;
+
+            // word is stopword
+            if (stopwords_de.includes(wordLC)) return; 
+            
+
+            if (wordsByCount[wordLC]){
+                wordsByCount[wordLC].count++; 
+            } else {
+                wordsByCount[wordLC] = { text: word, count: 1 };
+            }
+        });
+        console.log(wordsByCount);
+        var wordsByCountArr = []; 
+        for (var i in wordsByCount){
+            if (wordsByCount.hasOwnProperty(i) && wordsByCount[i].count > 1){
+                wordsByCountArr.push(wordsByCount[i]);
+            }
+        }
+        console.log(wordsByCountArr);
+
+        // set the dimensions and margins of the graph
+        var margin = {top: 10, right: 10, bottom: 10, left: 10},
+        width = 550 - margin.left - margin.right,
+        height = 550 - margin.top - margin.bottom;
+
+        // append the svg object to the body of the page
+        var svg = d3.select("#my_dataviz").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("width", "100%")
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")");
+
+        // Constructs a new cloud layout instance. It run an algorithm to find the position of words that suits your requirements
+        // Wordcloud features that are different from one word to the other must be here
+        var layout = d3.layout.cloud()
+        .size([width, height])
+        .words(wordsByCountArr.map(function(d) { return {text: d.text, size: d.count }; }))
+        .padding(5)        //space between words
+        //.rotate(-45)       // rotation angle in degrees
+        .fontSize(20)      // font size of words
+        .on("end", draw);
+        layout.start();
+
+        // This function takes the output of 'layout' above and draw the words
+        // Wordcloud features that are THE SAME from one word to the other can be here
+        function draw(words) {
+        svg
+        .append("g")
+        .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+        .selectAll("text")
+            .data(words)
+        .enter().append("text")
+            .style("font-size", function(d) { return d.size + "px"; })
+            .style("fill", "#ff8c00")
+            .attr("text-anchor", "middle")
+            .style("font-family", "Impact")
+            .attr("transform", function(d) {
+            return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+            })
+            .text(function(d) { return d.text; });
+        }
+    }
+    
 })();
