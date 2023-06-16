@@ -59,6 +59,15 @@
             //shadowUrl: 'my-icon-shadow.png',
             //shadowSize: [68, 95],
             //shadowAnchor: [22, 94]
+        }),
+        'kpoi': L.icon({
+            iconUrl: '/img/kolping_poi_200px.png',
+            iconSize: [20, 20]
+            //iconAnchor: [22, 94],
+            //popupAnchor: [-3, -76],
+            //shadowUrl: 'my-icon-shadow.png',
+            //shadowSize: [68, 95],
+            //shadowAnchor: [22, 94]
         })
     };
 
@@ -198,6 +207,34 @@
                 }
             });
 
+            data.pois.forEach((poi,i) => {
+                var popup_text = [
+                    '<b>' + poi.name + '</b>'
+                ];
+
+                if (poi.subname) popup_text.push(poi.subname);
+
+                if (poi.description){
+                    popup_text.push('<p>' + poi.description + '</p>');
+                }
+
+                if (poi.address){
+                    popup_text.push(e.address);
+                    popup_text.push("");
+                }
+                if (poi.tel){
+                    popup_text.push(e.tel);
+                }
+                if (poi.email){
+                    popup_text.push(e.email);
+                }
+                if (poi.url) popup_text.push('<a href="'+poi.url+'" target="_blank">Webseite &raquo;</a>');
+
+                if (poi.geo){
+                    L.marker([poi.geo.lat, poi.geo.lon], {icon: mapicons["kpoi"]}).addTo(mymap).bindPopup(popup_text.join('<br>'));
+                }
+            });
+
             updateEventTable(); 
             drawWordCloud();
         }
@@ -257,6 +294,15 @@
             }
         }
         console.log(wordsByCountArr);
+
+        // shuffle - credit: https://stackoverflow.com/a/46545530
+        wordsByCountArr = wordsByCountArr.map(value => ({ value, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({ value }) => value);
+
+        wordsByCountArr.forEach((word) => {
+            $("#wc_test").append($("<span>").text(word.text+" ").attr("title", word.text + " - " + word.count + "x").css("font-size", (10+(word.count*0.3)) + "px"));
+        })
 
         // set the dimensions and margins of the graph
         var margin = {top: 10, right: 10, bottom: 10, left: 10},

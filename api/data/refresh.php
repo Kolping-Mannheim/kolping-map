@@ -29,6 +29,7 @@
     addListByPattern("~^kolpingsfamilien\.([a-z0-9]+)\.php$~i", "list");
     addListByPattern("~^(workcamps)\.php$~i", "workcamps");
     addListByPattern("~^kolpinghaeuser\.([a-z0-9]+)\.php$~i", "kolpinghotels");
+    addListByPattern("~^pois\.([a-z0-9]+)\.php$~i", "pois");
 
     file_put_contents(__DIR__.'/locallist.json', json_encode($list, JSON_PRETTY_PRINT)); 
 
