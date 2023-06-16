@@ -219,14 +219,14 @@
                 }
 
                 if (poi.address){
-                    popup_text.push(e.address);
+                    popup_text.push(poi.address);
                     popup_text.push("");
                 }
                 if (poi.tel){
-                    popup_text.push(e.tel);
+                    popup_text.push(poi.tel);
                 }
                 if (poi.email){
-                    popup_text.push(e.email);
+                    popup_text.push(poi.email);
                 }
                 if (poi.url) popup_text.push('<a href="'+poi.url+'" target="_blank">Webseite &raquo;</a>');
 

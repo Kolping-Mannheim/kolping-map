@@ -16,7 +16,7 @@
         if (isset($poi["address"]) && !isset($poi["geo"])){
             $geocoding = getGeocodingByQuery($poi["address"] . ", DE");
             if ($geocoding){
-                $local["geo"] = $geocoding;
+                $pois[$p]["geo"] = $geocoding;
             }
         }
     }
