@@ -5,3 +5,8 @@
 td {
     vertical-align: top;
 }
+
+.leaflet-popup-content * {
+    margin: 0px; 
+    padding: 0px; 
+}

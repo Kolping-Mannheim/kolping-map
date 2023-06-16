@@ -147,7 +147,7 @@
         return $res; 
     }
 
-    $locallist = []; 
+    $locallist = [];
     foreach ($data as $e => $entry){
         if (trim($entry["type"]) != "family") continue; 
 
@@ -212,6 +212,19 @@
             $local["links"] = array_merge($msdata["links"], $local["links"]);
         } else {
             logtxt("custom domain: ".$entry["url"]);
+
+            // geocoding fallback via name
+            $townname = preg_replace("~^Kolpingsfamilie ~i", "", $local["name"]);
+            // Kolpingsfamilie Nürnberg/St. Elisabeth
+            $townname = preg_replace("~(/| )(St\.|Herz).*$~i", "", $townname);
+            $townname = preg_replace("~e\.V\.$~i", "", $townname);
+            $townname = preg_replace("~-Zentral$~i", "", $townname);
+            $townname = trim($townname);
+            
+            $geocoding = getGeocodingByQuery($townname . ", DE");
+            if ($geocoding){
+                $local["geo"] = $geocoding;
+            }
         }
 
         if (isset($local["contact"]["name"]) && isset($local["representative"]["name"]) 

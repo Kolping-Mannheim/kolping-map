@@ -41,6 +41,24 @@
             //shadowUrl: 'my-icon-shadow.png',
             //shadowSize: [68, 95],
             //shadowAnchor: [22, 94]
+        }),
+        'wc': L.icon({
+            iconUrl: '/img/kolping-jgd-weltkugel_orange_100px.png',
+            iconSize: [20, 20]
+            //iconAnchor: [22, 94],
+            //popupAnchor: [-3, -76],
+            //shadowUrl: 'my-icon-shadow.png',
+            //shadowSize: [68, 95],
+            //shadowAnchor: [22, 94]
+        }),
+        'khotel': L.icon({
+            iconUrl: '/img/kolping-hotel.png',
+            iconSize: [20, 20]
+            //iconAnchor: [22, 94],
+            //popupAnchor: [-3, -76],
+            //shadowUrl: 'my-icon-shadow.png',
+            //shadowSize: [68, 95],
+            //shadowAnchor: [22, 94]
         })
     };
 
@@ -52,7 +70,7 @@
     var wordCloudWords = [];
 
     $.ajax({
-        url: '/api/data/locallist.json',
+        url: '/api/',
         dataType: 'json',
         success: function (data){
             console.log(data); 
@@ -79,22 +97,34 @@
                 popup_text.push("Diözesanverband " + e._kolping_region);
 
                 if (e.hasMicrositeNewsLast6m){
-                    popup_text.push("<ul>");
+                    popup_text.push("<i>Aktuelle Neuigkeiten:</i>");
+                    var popup_news = []; 
+                    popup_news.push("<ul>");
                     e.news.forEach((news, n) => {
-                        popup_text.push('<li><a href="'+news.url+'" target="_blank">'+news.title+'</a></li>');
+                        if (n > 4) return; 
+                        popup_news.push('<li><a href="'+news.url+'" target="_blank">'+news.title+'</a></li>');
                         wordCloudWords = wordCloudWords.concat(news.title.split(" "));
                     });
-                    popup_text.push("</ul>");
+                    popup_news.push("</ul>");
+                    popup_text.push(popup_news.join(''));
                 } else {
                     popup_text.push("Diese Kolpingsfamilie hat in den letzten 6 Monaten keine Neuigkeiten veröffentlicht.");
                 }
-                if (e.events){
+                if (e.events && e.events.length > 0){
+                    popup_text.push("<i>Anstehende Veranstaltungen:</i>");
+                    var popup_events = []; 
+                    popup_events.push("<ul>");
                     e.events.forEach((event) => {
+                        
+                        popup_events.push('<li>'+event.date+': ' +event.title+'</li>');
+                        
                         event.kf = e.name; 
                         event.dv = e._kolping_region; 
                         kfevents.push(event); 
                         wordCloudWords = wordCloudWords.concat(event.title.split(" "));
                     });
+                    popup_events.push("</ul>");
+                    popup_text.push(popup_events.join(''));
                 }
                 if (e.geo){
                     L.marker([e.geo.lat, e.geo.lon], {icon: mapicons["kf"]}).addTo(mymap).bindPopup(popup_text.join('<br>'));
@@ -113,6 +143,58 @@
 
                 if (e.geo){
                     L.marker([e.geo.lat, e.geo.lon], {icon: mapicons["kh"]}).addTo(mymap).bindPopup(popup_text.join('<br>'));
+                }
+            });
+
+            data.workcamps.forEach((e,i) => {
+                var popup_text = [
+                    '<b>Kolping Workcamp: "' + e.name + '"</b>'
+                ];
+
+                if (e.subname) popup_text.push(e.subname);
+
+                if (e.description){
+                    popup_text.push('<p>' + e.description + '</p>');
+                }
+                
+                popup_text.push('<a href="'+e.url+'" target="_blank">Zum Angebot &raquo;</a>');
+                popup_text.push("");
+                if (e.image){
+                    popup_text.push('<img src="'+e.image+'" style="max-width: 200px;">');
+                }
+
+                if (e.geo){
+                    L.marker([e.geo.lat, e.geo.lon], {icon: mapicons["wc"]}).addTo(mymap).bindPopup(popup_text.join('<br>'));
+                }
+            });
+
+            data.kolpinghotels.forEach((e,i) => {
+                console.log(e); 
+                var popup_text = [
+                    '<b>' + e.name + '</b>'
+                ];
+
+                if (e.subname) popup_text.push(e.subname);
+
+                if (e.description){
+                    popup_text.push('<p>' + e.description + '</p>');
+                }
+
+                if (e.address){
+                    popup_text.push(e.address);
+                    popup_text.push("");
+                }
+                if (e.tel){
+                    popup_text.push(e.tel);
+                }
+                if (e.email){
+                    popup_text.push(e.email);
+                }
+                popup_text.push('<a href="'+e.url+'" target="_blank">Zum Hotel &raquo;</a>');
+                popup_text.push("");
+
+                if (e.geo){
+                    L.marker([e.geo.lat, e.geo.lon], {icon: mapicons["khotel"]}).addTo(mymap).bindPopup(popup_text.join('<br>'));
                 }
             });
 
@@ -170,7 +252,7 @@
         console.log(wordsByCount);
         var wordsByCountArr = []; 
         for (var i in wordsByCount){
-            if (wordsByCount.hasOwnProperty(i) && wordsByCount[i].count > 1){
+            if (wordsByCount.hasOwnProperty(i) && wordsByCount[i].count > 2){
                 wordsByCountArr.push(wordsByCount[i]);
             }
         }

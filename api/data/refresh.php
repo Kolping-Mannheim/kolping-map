@@ -7,18 +7,28 @@
             "lastupdated" => date("Y-m-d H:i:s")
         ],
         "list" => [],
-        "kolpinghaeuser" => json_decode(file_get_contents(__DIR__.'/kolpinghaeuser.json'), true)
+        "kolpinghaeuser" => json_decode(file_get_contents(__DIR__.'/kolpinghaeuser.json'), true),
+        "workcamps" => []
     ];
 
-    $sources = scandir(__DIR__.'/sources'); 
-    foreach ($sources as $source){
-        if (preg_match("~^kolpingsfamilien\.([a-z0-9]+)\.php$~i", $source, $matches)){
-            // if ($matches[1] != "pl") continue; 
+    function addListByPattern($pattern, $type){
+        global $list, $_CONFIG; 
 
-            $this_list = include __DIR__.'/sources/'.$source; 
-            $list["list"] = array_merge($list["list"], $this_list);
+        $sources = scandir(__DIR__.'/sources'); 
+        foreach ($sources as $source){
+            if (preg_match($pattern, $source, $matches)){
+                // if ($matches[1] != "pl") continue; 
+
+                $this_list = include __DIR__.'/sources/'.$source; 
+                if (!isset($list[$type])) $list[$type] = array(); 
+                $list[$type] = array_merge($list[$type], $this_list);
+            }
         }
     }
+
+    addListByPattern("~^kolpingsfamilien\.([a-z0-9]+)\.php$~i", "list");
+    addListByPattern("~^(workcamps)\.php$~i", "workcamps");
+    addListByPattern("~^kolpinghaeuser\.([a-z0-9]+)\.php$~i", "kolpinghotels");
 
     file_put_contents(__DIR__.'/locallist.json', json_encode($list, JSON_PRETTY_PRINT)); 
 ?>
