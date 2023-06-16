@@ -17,7 +17,7 @@
         $sources = scandir(__DIR__.'/sources'); 
         foreach ($sources as $source){
             if (preg_match($pattern, $source, $matches)){
-                // if ($matches[1] != "pl") continue; 
+                // if ($matches[1] != "za") continue; 
 
                 $this_list = include __DIR__.'/sources/'.$source; 
                 if (!isset($list[$type])) $list[$type] = array(); 
@@ -31,4 +31,5 @@
     addListByPattern("~^kolpinghaeuser\.([a-z0-9]+)\.php$~i", "kolpinghotels");
 
     file_put_contents(__DIR__.'/locallist.json', json_encode($list, JSON_PRETTY_PRINT)); 
+
 ?>
