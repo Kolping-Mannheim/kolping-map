@@ -17,7 +17,7 @@
         $sources = scandir(__DIR__.'/sources'); 
         foreach ($sources as $source){
             if (preg_match($pattern, $source, $matches)){
-                // if ($matches[1] != "za") continue; 
+                // if ($matches[1] != "cz") continue; 
 
                 $this_list = include __DIR__.'/sources/'.$source; 
                 if (!isset($list[$type])) $list[$type] = array(); 
