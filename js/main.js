@@ -88,12 +88,12 @@
                     '<b>' + e.name + '</b>',
                     ''
                 ];
-                if (e.contact && e.contact.name){
+                if (e.contact){
                     popup_text.push("<u>Ansprechpartner:</u>");
-                    popup_text.push(e.contact.name);
-                    if (e.contact.email){
-                        popup_text.push('<a href="mailto:'+e.contact.email+'">'+e.contact.email+'</a>');
-                    }
+                    if (e.contact.name) popup_text.push(e.contact.name);
+                    if (e.contact.email) popup_text.push('<a href="mailto:'+e.contact.email+'">'+e.contact.email+'</a>');
+                    if (e.contact.tel) popup_text.push(e.contact.tel);
+                    if (e.contact.fax) popup_text.push(e.contact.fax);
                     popup_text.push("");
                 }
                 if (e.hasMicrosite){
