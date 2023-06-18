@@ -5,6 +5,7 @@
     @$doc->loadHTML($rawpage); 
     $xpath = new DOMXPath($doc);
     $submenus = $xpath->query('//ul[contains(@class,"sub-menu")]/li');
+    $locallist = []; 
     foreach ($submenus as $submenu){
         $a = $xpath->query('a', $submenu)->item(0);
         if ($a->textContent == "Kolpingsfamilien"){
@@ -30,9 +31,7 @@
 
                 $locallist[] = $local; 
             }
-            
         }
-        
     }
     
     return $locallist; 

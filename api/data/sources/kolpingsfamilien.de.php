@@ -239,8 +239,6 @@
             }
         }
         $locallist[] = $local; 
-
-        //if ($e > 1750) break; 
     }
 
     return $locallist; 
