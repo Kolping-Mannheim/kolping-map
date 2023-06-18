@@ -71,19 +71,25 @@
         })
     };
 
-    L.tileLayer('/osmtiles/tile.php?s={s}&z={z}&x={x}&y={y}', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> Beitragende | &copy; Kolpingwerk Deuschland'
+    L.tileLayer('/osmtiles/tile.php?s={s}&z={z}&x={x}&y={y}&r={r}', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> Beitragende | &copy; Engagierte im Kolpingwerk weltweit'
     }).addTo(mymap);
 
     var kfevents = []; 
     var wordCloudWords = [];
 
+    
+
     $.ajax({
         url: '/api/',
         dataType: 'json',
         success: function (data){
-            console.log(data); 
+            var markercluster = L.markerClusterGroup({
+                maxClusterRadius: 50
+            });
             data.list.forEach((e,i) => {
+                
+
                 var popup_text = [
                     '<b>' + e.name + '</b>',
                     ''
@@ -136,9 +142,11 @@
                     popup_text.push(popup_events.join(''));
                 }
                 if (e.geo){
-                    L.marker([e.geo.lat, e.geo.lon], {icon: mapicons["kf"]}).addTo(mymap).bindPopup(popup_text.join('<br>'));
+                    markercluster.addLayer(L.marker([e.geo.lat, e.geo.lon], {icon: mapicons["kf"]}).bindPopup(popup_text.join('<br>')));
+                    //L.marker([e.geo.lat, e.geo.lon], {icon: mapicons["kf"]}).addTo(mymap).bindPopup(popup_text.join('<br>'));
                 }
             });
+            mymap.addLayer(markercluster);
             data.kolpinghaeuser.forEach((e,i) => {
                 var popup_text = [
                     '<b>' + e.name + '</b>',
@@ -178,7 +186,6 @@
             });
 
             data.kolpinghotels.forEach((e,i) => {
-                console.log(e); 
                 var popup_text = [
                     '<b>' + e.name + '</b>'
                 ];
@@ -245,7 +252,6 @@
 
         var $tbody = $("#events tbody"); 
 
-        console.log(kfevents);
         kfevents.sort((a,b) => (a.date > b.date) ? 1 : ((b.date > a.date) ? -1 : 0))
 
 
@@ -263,8 +269,6 @@
     // d3 wordcloud
     drawWordCloud = function (){
         // List of words#
-        console.log(wordCloudWords);
-
         var wordsByCount = {};
         wordCloudWords.forEach((word) => {
             word = word.replace(/(:|”|“)/i, '');
@@ -286,14 +290,13 @@
                 wordsByCount[wordLC] = { text: word, count: 1 };
             }
         });
-        console.log(wordsByCount);
+
         var wordsByCountArr = []; 
         for (var i in wordsByCount){
             if (wordsByCount.hasOwnProperty(i) && wordsByCount[i].count > 2){
                 wordsByCountArr.push(wordsByCount[i]);
             }
         }
-        console.log(wordsByCountArr);
 
         // shuffle - credit: https://stackoverflow.com/a/46545530
         wordsByCountArr = wordsByCountArr.map(value => ({ value, sort: Math.random() }))

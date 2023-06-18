@@ -20,8 +20,13 @@
                 // if ($matches[1] != "at") continue; 
 
                 $this_list = include __DIR__.'/sources/'.$source; 
+                logtxt($source);
+                logtxt(sizeof($this_list));
                 if (!isset($list[$type])) $list[$type] = array(); 
                 $list[$type] = array_merge($list[$type], $this_list);
+                logtxt($type." = ".sizeof($list[$type]));
+
+                sleep(5);
             }
         }
     }

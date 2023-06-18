@@ -8,6 +8,7 @@
         "z" => "~^[0-9]+$~i",
         "x" => "~^[0-9]+$~i",
         "y" => "~^[0-9]+$~i",
+        //"r" => "~^[@0-9a-z]+$~i",
     ];
     $noncacheparams = ['s'];
 
@@ -23,6 +24,7 @@
         http_response_code(400); 
     } else {
         $url = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'; 
+        //$url = 'https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}@2x.png';
         $cacheurl = $url; 
         foreach ($params as $param => $pattern){
             $url = str_replace("{".$param."}", $_REQUEST[$param], $url);
@@ -36,7 +38,7 @@
         if (file_exists($cache_filename) && filemtime($cache_filename) > time()-60*60*24*3){
             $tile = file_get_contents($cache_filename);
         } else {
-            $opts = array('http'=>array('header' => "User-Agent: flohmarkt.fuhrleut.de/1.0\r\n"));
+            $opts = array('http'=>array('header' => "User-Agent: map.kolping.community/1.0\r\n"));
             $context = stream_context_create($opts);
             $tile = file_get_contents($url, false, $context); 
             if ($tile){
