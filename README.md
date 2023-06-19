@@ -17,4 +17,4 @@ Die zugehörigen Skripte finden sich in ```api/data/sources/{art}.{land}.php```.
 | Tschechien (CZ) | ✔️ https://www.kolping.cz/kolpingovy-rodiny/ | - | - |  |
 | Italien / Südtirol (IT) | ✔️ https://www.kolping.it/ | - | - |  |
 | Polen (PL) | ✔️ https://kolping.pl/rodziny-kolpinga/ | - | - |  |
-| Italien / Südtirol (IT) | ✔️ https://kolpingsa.co.za/kolping-families/ | - | - |  |
+| Südafrika (ZA) | ✔️ https://kolpingsa.co.za/kolping-families/ | - | - |  |
