@@ -18,3 +18,9 @@ Die zugehörigen Skripte finden sich in ```api/data/sources/{art}.{land}.php```.
 | Italien / Südtirol (IT) | ✔️ https://www.kolping.it/ | - | - |  |
 | Polen (PL) | ✔️ https://kolping.pl/rodziny-kolpinga/ | - | - |  |
 | Südafrika (ZA) | ✔️ https://kolpingsa.co.za/kolping-families/ | - | - |  |
+
+## Roadmap
+- [ ] Unterstützung für weitere Länder (Tipps / Listen mit Kolpingsfamilien gerne an [map@kolping.community](mailto:map@kolping.community))
+- [ ] API, um die Infos, Neuigkeiten und Kontaktdaten pro Layer / Kolpingsfamilie dynamisch nachzuladen
+- [ ] Datenspeicherung in der Datenbank zur Performance-Verbesserung und um historische Daten zu behalten
+- [ ] Embed-Möglichkeit, damit Kolping-Verbände die Karte möglichst einfach auf ihrer Webseite einbinden können
